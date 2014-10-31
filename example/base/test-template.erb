@@ -1,0 +1,22 @@
+### This is the parent image config
+parent: <%= parent %>
+
+### This is the maintainer of the image
+maintainer: <%= maintainer %>
+
+### This is the bind location for the workspace
+bind: <%= bind %>
+
+### This is the location of the workspace on the host machine
+workspace: <%= workspace %>
+
+### This is the image name
+name: <%= name %>
+
+### This is the target tag/version
+tag: <%= tag %>
+
+### The render function will render other files
+### START RENDER ###
+include: <%= render "init.sh.erb"  %>
+### END RENDER  ###

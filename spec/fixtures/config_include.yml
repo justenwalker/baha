@@ -1,0 +1,7 @@
+---
+defaults:
+  parent: ubuntu:14.04.1
+  repository: docker.example.com/baha
+  maintainer: Ishmael <ishmael@example.com>
+images:
+  - include: base_image.yml

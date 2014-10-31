@@ -1,0 +1,10 @@
+---
+parent: 'ubuntu:14.04.1'
+name: base
+tag: 1.0.0
+maintainer: '"Captain Ahab" <ahab@example.com>'
+pre_build:
+- { download: 'http://www.google.com', file: 'myfile.txt' }
+config:
+  exposedports: 
+  - 8080

@@ -1,0 +1,12 @@
+---
+defaults:
+  parent: ubuntu:14.04.1
+  repository: docker.example.com/baha
+  maintainer: Ishmael <ishmael@example.com>
+images:
+  - include: config_build_image.yml
+  - parent: 'base:1.0.0'
+    name: derived
+    tag: 1.0.0
+    pre_build:
+    - { download: 'http://www.google.com', file: 'myfile.txt' }

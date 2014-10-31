@@ -1,0 +1,13 @@
+---
+docker_url: tcp://127.0.1.1:2375
+defaults:
+  parent: ubuntu:14.04.1
+  repository: docker.example.com/baha
+  maintainer: Ishmael <ishmael@example.com>
+ssl:
+  key: key.pem
+  cert: cert.pem
+  ca: ca.pem
+  verify: true
+images:
+ - include: base_image.yml

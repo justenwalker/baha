@@ -1,0 +1,11 @@
+#! /bin/bash
+
+## Install required packages
+apt-get update
+apt-get upgrade -y
+apt-get install -y curl gnupg
+
+## Cleanup after ourselves
+apt-get autoremove -y
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

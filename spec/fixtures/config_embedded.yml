@@ -1,0 +1,11 @@
+---
+docker_url: unix:///var/run/docker.sock
+defaults:
+  parent: ubuntu:14.04.1
+  repository: docker.example.com/baha
+  maintainer: Ishmael <ishmael@example.com>
+images:
+   - parent: 'ubuntu:14.04.1'
+     name: base
+     tag: 1.0.0
+     maintainer: '"Captain Ahab" <ahab@example.com>'

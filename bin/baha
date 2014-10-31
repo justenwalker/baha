@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'baha/cli'
+
+Baha::CLI.start(ARGV)

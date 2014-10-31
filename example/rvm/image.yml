@@ -1,0 +1,33 @@
+### Base on another image created before me
+parent: base:1.0.0
+name: rvm-test
+tag: 1.9.3
+### Override default maintainer
+maintainer: '"Captain Ahab" <ahab@example.com>'
+### Override default bind mount
+bind: '/.rvm'
+pre_build:
+  - { download: 'https://get.rvm.io', file: 'rvm.sh' }
+  - { template: 'rvm/init.sh.erb', dest: 'init.sh' }
+command: ['/bin/bash','/.rvm/init.sh']
+### Specify container's run configuration here
+config:
+  ### Takes an array of port numbers (assumes tcp)
+  ### Can also be in the form 9000/udp to expose UDP ports
+  exposedports: 
+    - 8080
+  ### Register volumes. Each array item should be a path
+  volumes:
+    - '/logs'
+  ### Environment variables. Hash of KEY=VALUE pairs
+  env:
+    HOME: '/root'
+  ### Entrypoint command. Should just be 1 string
+  entrypoint: '/bin/bash'
+  ### Override the docker containers hostname
+  hostname: 'my.hostname.docker'
+  ### Override the internal username executing the command
+  user: 'root'
+  ### Options coming after the entrypoint
+  cmd:
+    - '-l'

@@ -1,0 +1,12 @@
+#! /bin/bash
+
+## Install RVM
+gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+/bin/bash /.rvm/rvm.sh stable || exit 2
+source /etc/profile.d/rvm.sh
+rvm install 1.9.3
+
+## Clean up
+apt-get autoremove -y
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

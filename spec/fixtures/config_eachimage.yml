@@ -1,0 +1,12 @@
+---
+defaults:
+  parent: ubuntu:14.04.1
+  repository: docker.example.com/baha
+  maintainer: Ishmael <ishmael@example.com>
+images:
+  - include: base_image.yml
+  - include: no_such_file_exists.yml
+  - parent: 'ubuntu:14.04.1'
+    name: base
+    tag: 1.0.0
+    maintainer: '"Captain Ahab" <ahab@example.com>'
