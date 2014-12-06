@@ -85,7 +85,6 @@ Installation
 ```
 $ gem install baha
 ```
-### gem install baha
 
 Usage
 -----
@@ -113,7 +112,33 @@ Description:
   Reads the CONFIG file and builds all of the docker images in the order they appear.
 ```
 
+
+Example
+-------
+
 Check out the **example** directory for a sample CONFIG.
+
+To run the example build
+
+```
+### 1.
+### If necessary (using boot2docker) export the correct environment variables
+### You can find this by running boot2docker up
+# export DOCKER_HOST=tcp://192.168.59.103:2376
+# export DOCKER_CERT_PATH=$HOME/.boot2docker/certs/boot2docker-vm
+# export DOCKER_TLS_VERIFY=1
+
+### 2.
+### Checkout baha
+git clone https://github.com/justenwalker/baha.git
+cd baha
+
+### 3. Install bundle
+bundle install
+
+### 4. Run the example.yml
+bundle exec baha build -d example/example.yml
+```
 
 How it works
 ------------
