@@ -3,6 +3,8 @@ require 'baha/image'
 require 'baha/log'
 require 'baha/pre_build'
 require 'fileutils'
+require 'tempfile'
+require 'shellwords'
 
 class Baha::Builder
   LOG = Baha::Log.for_name("Builder")
@@ -47,6 +49,27 @@ class Baha::Builder
         FileUtils.mkdir_p workspace.to_s
       end
 
+      run = false
+      ## Image Run Config
+      if image.run
+        build_log.debug { "Image has RUN commands"}
+        run = '.init.sh' 
+        File.open(workspace + run,'w') do |f|
+          f.write("#!/bin/sh\n")
+          f.write("set -xe\n")
+          image.run.each do |cmd|
+            build_log.debug { "Writing command: #{cmd}"}
+            case cmd
+            when String
+              f.write("#{cmd}\n")
+            when Array
+              safe = Shellwords.shelljoin(cmd)
+              f.write("#{safe}\n")
+            end
+          end
+        end
+      end
+
       ## Pre-Build tasks
       build_log.info { "Building #{image.name}" }
       if image.pre_build
@@ -58,16 +81,20 @@ class Baha::Builder
       end
 
       ## Build Image
+      command = image.command
+      if run
+        command = ["/bin/sh", "#{image.bind}/#{run}"]
+      end
       container_config = {
         'Image'       => image.parent_id,
-        'Cmd'         => image.command,
+        'Cmd'         => command,
         'Workingdir'  => image.bind
       }
       build_log.debug { "Creating container for #{image.name} => #{container_config.inspect}" }
       container = Docker::Container.create(container_config)
       build_log.debug { "Created container #{container.id} "}
 
-      build_log.debug { "Running container for #{image.name}" }
+      build_log.debug { "Running container for #{image.name}: #{command}" }
       container.start({
         'Binds' => "#{image.workspace.expand_path}:#{image.bind}"
       })

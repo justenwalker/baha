@@ -1,0 +1,9 @@
+---
+defaults:
+  parent: ubuntu:14.04.1
+  repository: docker.example.com/baha
+  maintainer: Ishmael <ishmael@example.com>
+images:
+  - dockerfile: Dockerfile
+    name: base
+    tag: 1.0.0

@@ -15,7 +15,11 @@ module Baha
             when Fixnum
               config['ExposedPorts']["#{port}/tcp"] = {}
             when String
-              config['ExposedPorts'][port] = {}
+              if port.match(/^\d+$/)
+                config['ExposedPorts']["#{port}/tcp"] = {}
+              else
+                config['ExposedPorts'][port] = {}
+              end
           end
         end
       end
@@ -24,7 +28,7 @@ module Baha
         raise ERROR("should be an array") unless @value.kind_of?(Array)
         @value.each_with_index do |item,index|
           if item.kind_of?(String)
-            unless /(\d+)\/(tcp|udp)/ =~ item
+            unless /(\d+)(\/(tcp|udp))?/ =~ item
               raise ERROR("#{index}: '#{item}' should be in the form 8080/tcp")
             end
           end

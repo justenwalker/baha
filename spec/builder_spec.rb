@@ -44,10 +44,16 @@ describe Baha::Builder do
       let(:image2) {
         double('image2')
       }
+      let (:init) {
+        double('init.sh')
+      }
       before do
         allow_any_instance_of(Baha::Image).to receive(:needs_update?).and_return(true)
         allow_any_instance_of(Baha::Image).to receive(:parent_id).and_return('AAAA')
         allow(Docker::Container).to receive(:create).and_return(container)
+        allow(File).to receive(:open).with(pathname_matching(/init.sh$/),'w').and_yield(init)
+        allow(File).to receive(:open).with(pathname_matching(/.yml$/),/r/).and_call_original
+        allow(File).to receive(:open).with(pathname_matching(/Dockerfile/),/r/).and_call_original
         allow(container).to receive(:start)
         allow(container).to receive(:stop)
         allow(container).to receive(:streaming_logs).with({"stdout"=>true, "stderr"=>true, "follow"=>true, "timestamps"=>false}).and_yield(:stdout,"console message").and_yield(:stderr,"error line")
@@ -57,10 +63,18 @@ describe Baha::Builder do
         allow(Docker::Image).to receive(:get).with('BBBB').and_return(image)
         allow(image).to receive(:tag)
         allow(container).to receive(:remove)
+        allow(init).to receive(:write)
       end
       it 'executes pre_build step' do
         subject.build!
         expect(Baha::PreBuild::Module).to have_received(:execute).twice.with(hash_including('download' => "http://www.google.com"))
+      end
+      it 'write run script' do
+        subject.build!
+        expect(init).to have_received(:write).with("#!/bin/sh\n").ordered
+        expect(init).to have_received(:write).with("set -xe\n").ordered
+        expect(init).to have_received(:write).with("echo \"Hello\"\n").ordered
+        expect(init).to have_received(:write).with("/bin/echo World\n").ordered
       end
       it 'creates containers' do
         subject.build!
@@ -68,11 +82,11 @@ describe Baha::Builder do
       end
       it 'starts containers' do
         subject.build!
-        expect(container).to have_received(:start).twice
+        expect(container).to have_received(:start).exactly(3).times
       end
       it 'commits containers' do
         subject.build!
-        expect(container).to have_received(:commit).with({"run"=>{"ExposedPorts"=>{"8080/tcp"=>{}}}}).ordered
+        expect(container).to have_received(:commit).with({"run"=>{"ExposedPorts"=>{"8080/tcp"=>{}, "8081/tcp"=>{}, "8009/tcp"=>{}}}}).ordered
         expect(container).to have_received(:commit).with({'run' => {}}).ordered
       end
       it 'tags image' do

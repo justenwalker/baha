@@ -39,6 +39,22 @@ describe Baha::Config do
       its(:configdir) { should eq(fixture_path) }
       its(:workspace) { should eq(fixture_path + 'workspace') }
     end
+    context "with dockerfile" do
+      subject { Baha::Config.load(fixture('config_dockerfile.yml')) }
+      its(:defaults) { should eq(
+        {
+          :parent=>"ubuntu:14.04.1", 
+          :bind=>"/.baha", 
+          :repository=>'docker.example.com/baha', 
+          :maintainer => "Ishmael <ishmael@example.com>",
+          :command => ['/bin/bash','./init.sh'],
+          :timeout => 1200
+        }) 
+      }
+      its(:options) { should eq({}) }
+      its(:configdir) { should eq(fixture_path) }
+      its(:workspace) { should eq(fixture_path + 'workspace') }
+    end
     context "with DOCKER_CERT_PATH set" do
       subject { Baha::Config.load(fixture('config_embedded.yml')) } 
       before do
@@ -87,7 +103,7 @@ describe Baha::Config do
       subject.each_image do |image|
         images << image
       end
-      expect(images.size).to eq(2)
+      expect(images.size).to eq(3)
     end
   end
 end

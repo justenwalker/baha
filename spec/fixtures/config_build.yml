@@ -10,3 +10,6 @@ images:
     tag: 1.0.0
     pre_build:
     - { download: 'http://www.google.com', file: 'myfile.txt' }
+  - name: dockerfile
+    tag: 1.0
+    dockerfile: Dockerfile

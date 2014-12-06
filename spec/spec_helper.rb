@@ -37,3 +37,14 @@ RSpec.configure do |config|
     Baha::Log.logfile = StringIO.new
   end
 end
+
+RSpec::Matchers.define :pathname_matching do |expected|
+  match do |actual|
+    case expected
+    when Regexp
+      expected.match(actual.to_s) != nil
+    else
+      expected == actual
+    end
+  end
+end

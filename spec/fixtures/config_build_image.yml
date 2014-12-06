@@ -8,3 +8,5 @@ pre_build:
 config:
   exposedports: 
   - 8080
+  - '8081'
+  - 8009/tcp

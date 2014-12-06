@@ -1,6 +1,7 @@
 require 'yaml'
 require 'pathname'
 require 'baha/log'
+require 'baha/dockerfile'
 
 class Baha::Config
   DEFAULTS = {
@@ -82,6 +83,18 @@ class Baha::Config
           yield Baha::Image.new(self,yml)
         else
           LOG.error { "Unable to find image include: #{path}"}
+          next
+        end
+      elsif image.has_key?('dockerfile')
+        path = Pathname.new(image['dockerfile'])
+        file = resolve_file(path)
+        if file
+          dockerfile = Baha::Dockerfile.parse(file)
+          dockerfile['name'] = image['name']
+          dockerfile['tag'] = image['tag']
+          yield Baha::Image.new(self,dockerfile)
+        else
+          LOG.error { "Unable to find dockerfile: #{path}"}
           next
         end
       else

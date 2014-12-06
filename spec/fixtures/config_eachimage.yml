@@ -10,3 +10,9 @@ images:
     name: base
     tag: 1.0.0
     maintainer: '"Captain Ahab" <ahab@example.com>'
+  - dockerfile: Dockerfile
+    name: dockerfile
+    tag: 1.0.0
+  - dockerfile: no such dockerfile
+    name: invalid
+    tag: 1.0.0

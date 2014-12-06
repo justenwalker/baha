@@ -65,7 +65,7 @@ module Baha
         end
 
     end
-    attr_reader :parent, :image, :maintainer, :options, :pre_build, :bind, :command, :timeout, :workspace, :name, :tags
+    attr_reader :parent, :image, :maintainer, :options, :pre_build, :bind, :command, :timeout, :workspace, :name, :tags, :run
 
     def initialize(config,image)
       @parent = Baha::Image.parse_with_default(image['parent'] || config.defaults[:parent], config.defaults[:repository])
@@ -76,6 +76,7 @@ module Baha
       @pre_build = image['pre_build']
       @bind = image['bind'] || config.defaults[:bind]
       @command = image['command'] || config.defaults[:command]
+      @run = image['run']
       @timeout = image['timeout'] || config.defaults[:timeout]
       @workspace = config.workspace + (image['workspace'] || @image[:name])
       @name = @image[:name]
