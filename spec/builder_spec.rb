@@ -51,9 +51,8 @@ describe Baha::Builder do
         allow_any_instance_of(Baha::Image).to receive(:needs_update?).and_return(true)
         allow_any_instance_of(Baha::Image).to receive(:parent_id).and_return('AAAA')
         allow(Docker::Container).to receive(:create).and_return(container)
+        allow(File).to receive(:open).and_call_original
         allow(File).to receive(:open).with(pathname_matching(/init.sh$/),'w').and_yield(init)
-        allow(File).to receive(:open).with(pathname_matching(/.yml$/),/r/).and_call_original
-        allow(File).to receive(:open).with(pathname_matching(/Dockerfile/),/r/).and_call_original
         allow(container).to receive(:start)
         allow(container).to receive(:stop)
         allow(container).to receive(:streaming_logs).with({"stdout"=>true, "stderr"=>true, "follow"=>true, "timestamps"=>false}).and_yield(:stdout,"console message").and_yield(:stderr,"error line")
