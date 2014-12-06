@@ -7,11 +7,12 @@ require 'csv'
 
 module Baha
   class DockerfileParseError < RuntimeError
-    attr_reader :file, :line
-    def initialize(file,line)
-      super("Unable to parse Dockerfile #{file}:#{line}")
+    attr_reader :file, :line, :text
+    def initialize(file,line, text)
+      super("Unable to parse Dockerfile #{file}:#{line}\n#{text}")
       @file = file
       @line = line
+      @text = text
     end
   end
   class Dockerfile
@@ -46,8 +47,8 @@ module Baha
 
             line_to_parse = multiline.join("\n")
             LOG.debug { "Parsing #{linenum}: #{line_to_parse}" }
-            unless parse_line(image,multiline.join(' '))
-              raise DockerfileParseError.new(file,linenum)
+            unless parse_line(image,line_to_parse)
+              raise DockerfileParseError.new(file,linenum, line_to_parse)
             end
             multiline = []
           end
