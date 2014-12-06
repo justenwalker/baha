@@ -39,7 +39,7 @@ module Baha
             
             # Buffer multi-lines
             if line.match(/\\$/)
-              multiline << line.chomp
+              multiline << line.chop
               next
             end
             multiline << line
