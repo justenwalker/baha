@@ -3,6 +3,7 @@ Baha
 
 [![Gem Version](https://badge.fury.io/rb/baha.png)](http://badge.fury.io/rb/baha)
 [![Build Status](https://travis-ci.org/justenwalker/baha.png?branch=master)](https://travis-ci.org/justenwalker/baha)
+[![Code Climate](https://codeclimate.com/github/justenwalker/baha/badges/gpa.svg)](https://codeclimate.com/github/justenwalker/baha)
 
 Introduction
 ------------
