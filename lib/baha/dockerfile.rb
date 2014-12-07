@@ -4,6 +4,7 @@ require 'baha/log'
 require 'set'
 require 'json'
 require 'csv'
+require 'yaml'
 
 module Baha
   class DockerfileParseError < RuntimeError

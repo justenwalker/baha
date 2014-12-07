@@ -1,6 +1,7 @@
 require 'thor'
 require 'baha/builder'
 require 'baha/log'
+require 'baha/dockerfile'
 
 class Baha::CLI < Thor
   desc "build [options] CONFIG", "Builds all docker images based on the given config"
@@ -60,6 +61,58 @@ class Baha::CLI < Thor
       exit 1
     ensure
       Baha::Log.close!
+    end
+  end
+  desc "convert DOCKERFILE", "Converts an existing dockerfile to a Baha-compatible image.yml"
+  long_desc <<-LONGDESC
+  Reads the given Dockerfile and outputs a Baha-compatible image.yml which can be included or embedded within a CONFIG
+  LONGDESC
+  option :name, {
+    :aliases => :n,
+    :required => true,
+    :type => :string,
+    :desc => "The target image name"
+  }
+  option :tag, {
+    :aliases => :t,
+    :required => false,
+    :type => :string,
+    :default => 'latest',
+    :desc => 'The target image tag'
+  }
+  option :output, {
+    :aliases => :o,
+    :required => false,
+    :type => :string,
+    :default => 'STDOUT',
+    :desc => 'Target output file'
+  }
+  def convert(dockerfile)
+    file = Pathname.new(dockerfile)
+    out = options[:output]
+    name = options[:name]
+    tag = options[:tag]
+    Baha::Log.logfile = STDERR
+    Baha::Log.level = :info
+    log = Baha::Log.for_name("CLI")
+    begin
+      if file.exist?
+        yaml = Baha::Dockerfile.parse(dockerfile)
+        yaml = { 'name' => name, 'tag' => tag }.merge(yaml)
+        if out == 'STDOUT'
+          puts yaml.to_yaml
+        else
+          File.open(out,'w') do |f|
+            f.write yaml.to_yaml
+          end
+        end
+      else
+          log.fatal { "DOCKERFILE #{dockerfile} not found" }
+          exit 1
+      end
+    rescue Exception => e
+      log.fatal("Error encountered while building images")
+      log.fatal(e)
     end
   end
   desc "version", "Print version and exit"
