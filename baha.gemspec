@@ -8,8 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Baha::VERSION
   spec.authors       = ["Justen Walker"]
   spec.email         = ["justen.walker+github@gmail.com"]
-  spec.summary       = %q{Baha - a command-line utility that assists in the creation of docker images.}
-  spec.description   = spec.summary
+  spec.summary       = %q{Baha is a command-line utility that assists in the creation of docker images.}
+  spec.description   = spec.summary + "\n" +
+                       %q{It addresses some of Dockerfiles shortcomings and encourages smaller, reusable, tagged images.}
   spec.homepage      = "https://github.com/justenwalker/baha"
   spec.license       = "MIT"
 
