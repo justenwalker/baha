@@ -92,9 +92,10 @@ Usage
 
 ```
 Baha Commands:
-  baha build [options] CONFIG  # Builds all docker images based on the given config
-  baha help [COMMAND]          # Describe available commands or one specific command
-  baha version                 # Print version and exit
+  baha build [options] CONFIG             # Builds all docker images based on the given config
+  baha convert DOCKERFILE n, --name=NAME  # Converts an existing dockerfile to a Baha-compatible image.yml
+  baha help [COMMAND]                     # Describe available commands or one specific command
+  baha version                            # Print version and exit
 ```
 
 **build**
@@ -113,6 +114,23 @@ Description:
   Reads the CONFIG file and builds all of the docker images in the order they appear.
 ```
 
+**convert**
+
+```
+Usage:
+  baha convert DOCKERFILE n, --name=NAME
+
+Options:
+  n, --name=NAME        # The target image name
+  t, [--tag=TAG]        # The target image tag
+                        # Default: latest
+  o, [--output=OUTPUT]  # Target output file
+                        # Default: STDOUT
+
+Description:
+  Reads the given Dockerfile and outputs a Baha-compatible image.yml 
+  which can be included or embedded within a CONFIG
+```
 
 Example
 -------
