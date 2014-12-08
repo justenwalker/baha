@@ -1,7 +1,8 @@
 require 'baha/pre_build'
 require 'open3'
 
-class Baha::PreBuild::Module::Command
+module Baha
+class PreBuild::Module::Command
   LOG = Baha::Log.for_name("Module::Command")
 
   def self.execute(mod)
@@ -45,7 +46,7 @@ class Baha::PreBuild::Module::Command
 
   end
 end
-
+end
 Baha::PreBuild::Module.register(:command) do |mod|
   Baha::PreBuild::Module::Command.execute(mod)
 end

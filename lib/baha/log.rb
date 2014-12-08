@@ -1,4 +1,5 @@
-class Baha::Log
+module Baha
+class Log
   require 'logger'
   LEVELS = {
       :debug => Logger::DEBUG,
@@ -77,4 +78,5 @@ class Baha::Log
       end
     end
   end
+end
 end

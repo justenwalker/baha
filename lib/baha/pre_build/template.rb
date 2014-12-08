@@ -2,7 +2,8 @@ require 'baha/pre_build'
 require 'erb'
 require 'ostruct'
 
-class Baha::PreBuild::Module::Template
+module Baha
+class PreBuild::Module::Template
   LOG = Baha::Log.for_name("Module::Template")
 
   class ErbBinding < OpenStruct
@@ -41,6 +42,7 @@ class Baha::PreBuild::Module::Template
       f.write(erb.result(ErbBinding.new(environment,mod.config).get_binding))
     end
   end
+end
 end
 
 Baha::PreBuild::Module.register(:template) do |mod|

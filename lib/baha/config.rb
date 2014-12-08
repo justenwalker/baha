@@ -3,7 +3,8 @@ require 'pathname'
 require 'baha/log'
 require 'baha/dockerfile'
 
-class Baha::Config
+module Baha
+class Config
   DEFAULTS = {
     :parent => 'ubuntu:14.04.1',
     :bind   => '/.baha',
@@ -152,4 +153,5 @@ class Baha::Config
     >
     eos
   end
+end
 end

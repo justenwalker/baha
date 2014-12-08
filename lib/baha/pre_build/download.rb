@@ -1,7 +1,8 @@
 require 'baha/pre_build'
 require 'open-uri'
 
-class Baha::PreBuild::Module::Download
+module Baha
+class PreBuild::Module::Download
   LOG = Baha::Log.for_name("Module::Download")
 
   def self.execute(mod)
@@ -21,6 +22,7 @@ class Baha::PreBuild::Module::Download
       end
     end
   end
+end
 end
 
 Baha::PreBuild::Module.register(:download) do |mod|

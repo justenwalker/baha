@@ -2,8 +2,10 @@ require 'thor'
 require 'baha/builder'
 require 'baha/log'
 require 'baha/dockerfile'
+require 'baha/version'
 
-class Baha::CLI < Thor
+module Baha
+class CLI < Thor
   desc "build [options] CONFIG", "Builds all docker images based on the given config"
   long_desc <<-LONGDESC
   Reads the CONFIG file and builds all of the docker images in the order they appear.
@@ -119,4 +121,5 @@ class Baha::CLI < Thor
   def version
     puts "baha " + Baha::VERSION
   end
+end
 end

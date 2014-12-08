@@ -6,7 +6,8 @@ require 'fileutils'
 require 'tempfile'
 require 'shellwords'
 
-class Baha::Builder
+module Baha
+class Builder
   LOG = Baha::Log.for_name("Builder")
 
   class BuildError < RuntimeError
@@ -154,4 +155,5 @@ class Baha::Builder
     >
     eos
   end
+end
 end
