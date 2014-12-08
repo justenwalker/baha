@@ -12,4 +12,4 @@ images:
     - { download: 'http://www.google.com', file: 'myfile.txt' }
   - name: dockerfile
     tag: 1.0
-    dockerfile: Dockerfile
+    dockerfile: Dockerfile.example

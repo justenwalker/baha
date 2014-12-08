@@ -8,7 +8,7 @@ describe Baha::Config do
   end
   describe "#parse" do
     context "with valid Dockerfile" do
-      subject { Baha::Dockerfile.parse(fixture('Dockerfile')) }
+      subject { Baha::Dockerfile.parse(fixture('Dockerfile.example')) }
       its(['parent']) { should eq('ubuntu:14.04.1')}
       its(['run']) { should eq([
         "echo \"Hello\"", 
