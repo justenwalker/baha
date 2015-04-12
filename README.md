@@ -185,24 +185,11 @@ Baha inside Docker
 
 If you'd like to use baha completely inside docker, you can follow these additional instructions.
 
+### Set up your environment
 
-### 1. Build baha as a docker image
+There are a few environment variables that Baha needs in order to work within docker. In most cases, the default values should be fine.
 
-Included with this git repository is a `Dockerfile`. Run the following command inside your working-copy to create a new local container called 'baha'
-
-```
-docker build -t baha .
-```
-
-### 2. Copy docker-baha.sh to somewhere in your $PATH and make it executable
-```
-cp docker-baha.sh /usr/local/bin/baha
-chmod 755 /usr/local/bin/baha
-```
-
-### 3. Set up your environment
-
-There are a few environment variables that Baha needs in order to work within docker.
+**BAHA_IMAGE** is the image that the `docker-baha.sh` script uses to run baha inside a docker container.  The default is `justenwalker/baha`. Modify this if you want to use a different image.
 
 **BAHA_MOUNT** is the location on the docker host that contains the config files. By default, this is the current working directory: `$PWD`
 
@@ -216,9 +203,31 @@ There are a few environment variables that Baha needs in order to work within do
 
 ```
 export BAHA_MOUNT=/Users/myself/baha
-export BAHA_WORKSPACE_MOUNT=/Users/mysql/baha/workspace
+export BAHA_WORKSPACE_MOUNT=/Users/myself/baha/workspace
 export DOCKER_SOCKET=/var/run/docker.sock
 ```
+
+### Copy docker-baha.sh to somewhere in your $PATH and make it executable
+
+To be able to easily execute the cli, `docker-baha.sh` has some sensible defaults and the actual docker run command-line options.  Feel free to modify to suit your needs.
+
+```
+cp docker-baha.sh /usr/local/bin/baha
+chmod 755 /usr/local/bin/baha
+```
+
+### Build baha as a docker image
+
+If you want to get started quickly, you can just use the latest image built on the Docker Hub.
+
+Run the following command inside your working-copy to create a new local image called 'justenwalker/baha'
+
+```
+docker build -t justenwalker/baha .
+```
+
+If you want to use a different image name, be sure to either modify `docker-baha.sh` or modify `BAHA_IMAGE` to use the new name.
+
 
 ### Run baha as you would normally
 
