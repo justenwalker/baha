@@ -42,7 +42,7 @@ class Builder
         build_log.info { "Skipped image #{image.name} - No update needed" }
         next
       end
-      
+
       ## Prepare Workspace
       workspace = Pathname.new(@config.workspace) + image.name
       unless workspace.exist?
@@ -54,7 +54,7 @@ class Builder
       ## Image Run Config
       if image.run
         build_log.debug { "Image has RUN commands"}
-        run = '.init.sh' 
+        run = '.init.sh'
         File.open(workspace + run,'w') do |f|
           f.write("#!/bin/sh\n")
           f.write("set -xe\n")
@@ -97,7 +97,7 @@ class Builder
 
       build_log.debug { "Running container for #{image.name}: #{command}" }
       container.start({
-        'Binds' => "#{image.workspace.expand_path}:#{image.bind}"
+        'Binds' => "#{image.host_mount.expand_path}:#{image.bind}"
       })
 
       begin
@@ -107,7 +107,7 @@ class Builder
           when :stdout
             build_log.info { "++ #{msg.chomp}" }
           when :stderr
-            build_log.warn { "++ #{msg.chomp}" }        
+            build_log.warn { "++ #{msg.chomp}" }
           end
         end
         ## Wait for finish

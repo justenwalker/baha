@@ -2,9 +2,11 @@ require 'yaml'
 require 'pathname'
 require 'baha/log'
 require 'baha/dockerfile'
+require 'baha/refinements'
 
 module Baha
 class Config
+  using Baha::Refinements
   DEFAULTS = {
     :parent => 'ubuntu:14.04.1',
     :bind   => '/.baha',
@@ -18,6 +20,7 @@ class Config
     def load(file)
       LOG.debug { "Loading file #{file}"}
       filepath = Pathname.new(file)
+      LOG.debug { "Loading file #{filepath.expand_path}"}
       raise ArgumentError.new("Cannot read config file #{file}") unless filepath.readable?
       config = YAML.load_file(filepath)
       config['configdir'] ||= filepath.dirname
@@ -30,47 +33,18 @@ class Config
 
   def initialize(config)
     @config = config
-    
+    config_workspace
+
     # Defaults
     defaults = config['defaults'] || {}
     raise ArgumentError.new("Expected Hash for defaults") unless defaults.is_a?(Hash)
     @defaults = {}
     DEFAULTS.keys.each do |k|
-      @defaults[k] = defaults[k] || defaults[k.to_s] || DEFAULTS[k]
+      @defaults[k] = defaults[k] || DEFAULTS[k]
     end
-
-    @configdir = Pathname.new(config['configdir'] || Pathname.pwd)
-    @workspace = Pathname.new(config['workspace'] || @configdir + 'workspace')
     @secure = false
     @options = {}
     init_security if ENV.has_key?('DOCKER_CERT_PATH') || config.has_key?('ssl')
-  end
-
-  def init_security
-    @secure = true
-    cert_path = ''
-    ssl_options = { }
-    if ENV['DOCKER_CERT_PATH']
-      cert_path = Pathname.new(ENV['DOCKER_CERT_PATH'])
-      ssl_options[:ssl_verify_peer] = (ENV['DOCKER_TLS_VERIFY'] == '1')
-      ssl_options[:client_cert] = (cert_path + 'cert.pem').expand_path.to_s
-      ssl_options[:client_key] = (cert_path + 'key.pem').expand_path.to_s
-      ssl_options[:ssl_ca_file] = (cert_path + 'ca.pem').expand_path.to_s
-    elsif @config.has_key?('ssl')
-      ssl = @config['ssl']
-      ssl_options[:ssl_verify_peer] = ssl['verify'] || false
-      if ssl.has_key?('cert_path')
-        cert_path = Pathname.new(ssl['cert_path'])
-        ssl_options[:client_cert] = (cert_path + 'cert.pem').expand_path.to_s
-        ssl_options[:client_key] = (cert_path + 'key.pem').expand_path.to_s
-        ssl_options[:ssl_ca_file] = (cert_path + 'ca.pem').expand_path.to_s
-      else
-        ssl_options[:client_cert] = ssl['cert']
-        ssl_options[:client_key] = ssl['key']
-        ssl_options[:ssl_ca_file] = ssl['ca']
-      end
-    end
-    @options.merge!(ssl_options)
   end
 
   def each_image
@@ -104,10 +78,18 @@ class Config
     end
   end
 
+  def workspace_for(image)
+    if @ws_mount
+      @ws_mount + image
+    else
+      @workspace + image
+    end
+  end
+
   def resolve_file(file)
     filepath = Pathname.new(file)
     LOG.debug { "resolve_file(#{file})" }
-    paths = [ 
+    paths = [
       filepath,            # 0. Absolute path
       @workspace + file,   # 1. Workspace
       @configdir + file,   # 2. Config
@@ -121,7 +103,7 @@ class Config
         else
           LOG.debug("did not find file at: #{path}")
         end
-      end  
+      end
       result
     end
   end
@@ -129,13 +111,7 @@ class Config
   # Initialize Docker Client
   def init_docker!
     Docker.options = @options
-    if @config.has_key?('docker_url')
-      url = @config['docker_url']
-      Docker.url = url
-    end
-    if @secure
-      Docker.url = Docker.url.gsub(/^tcp:/,'https:')
-    end
+    set_docker_url
     LOG.debug { "Docker URL: #{Docker.url}"}
     LOG.debug { "Docker Options: #{Docker.options.inspect}"}
     Docker.validate_version!
@@ -153,5 +129,75 @@ class Config
     >
     eos
   end
+
+  private
+
+  def config_workspace
+    def nonnil(*args)
+      args.find{ |x| not x.nil? }
+    end
+
+    if ENV['BAHA_MOUNT']
+      @ws_mount  = Pathname.new(ENV['BAHA_WORKSPACE_MOUNT'])
+      @cfg_mount = Pathname.new(ENV['BAHA_MOUNT'])
+      @configdir = Pathname.new('/baha')
+      @workspace = Pathname.new('/workspace')
+    else
+      cfgdir = @config['configdir'] || Pathname.pwd.to_s
+      @configdir = Pathname.new(cfgdir)
+
+      work = @config['workspace'] || (@configdir + 'workspace').to_s
+      @workspace = Pathname.new(work)
+    end
+  end
+
+  def set_docker_url
+    if @config.has_key?('docker_url')
+      Docker.url = @config['docker_url']
+    end
+    if @secure
+      Docker.url = Docker.url.gsub(/^tcp:/,'https:')
+    end
+  end
+
+  def ssl_from_env
+    ssl_options = {}
+    cert_path = Pathname.new(ENV['DOCKER_CERT_PATH'])
+    ssl_options[:ssl_verify_peer] = (ENV['DOCKER_TLS_VERIFY'] == '1')
+    ssl_options[:client_cert] = (cert_path + 'cert.pem').expand_path.to_s
+    ssl_options[:client_key] = (cert_path + 'key.pem').expand_path.to_s
+    ssl_options[:ssl_ca_file] = (cert_path + 'ca.pem').expand_path.to_s
+    ssl_options
+  end
+
+  def ssl_from_config
+    ssl = @config['ssl']
+    ssl_options = {}
+    ssl_options[:ssl_verify_peer] = ssl['verify'] || false
+    if ssl.has_key?('cert_path')
+      cert_path = Pathname.new(ssl['cert_path'])
+      ssl_options[:client_cert] = (cert_path + 'cert.pem').expand_path.to_s
+      ssl_options[:client_key] = (cert_path + 'key.pem').expand_path.to_s
+      ssl_options[:ssl_ca_file] = (cert_path + 'ca.pem').expand_path.to_s
+    else
+      ssl_options[:client_cert] = ssl['cert']
+      ssl_options[:client_key] = ssl['key']
+      ssl_options[:ssl_ca_file] = ssl['ca']
+    end
+    ssl_options
+  end
+
+  def init_security
+    @secure = true
+    cert_path = ''
+    ssl = { }
+    if ENV['DOCKER_CERT_PATH']
+      ssl = ssl_from_env
+    elsif @config.has_key?('ssl')
+      ssl = ssl_from_config
+    end
+    @options.merge!(ssl)
+  end
+
 end
 end

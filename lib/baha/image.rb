@@ -45,7 +45,7 @@ module Baha
           LOG.debug { "get_image!(#{image.inspect})" }
           tag = image[:tag] || 'latest'
           repo = "#{image[:ns]}/#{image[:name]}"
-          img = [ 
+          img = [
             lambda { Docker::Image.get("#{image[:name]}:#{image[:tag]}") },
             lambda { Docker::Image.create('fromImage'=> image[:name], 'tag' => tag) },
             lambda { Docker::Image.create('fromImage' => repo, 'tag' => tag) }
@@ -65,9 +65,10 @@ module Baha
         end
 
     end
-    attr_reader :parent, :image, :maintainer, :options, :pre_build, :bind, :command, :timeout, :workspace, :name, :tags, :run
+    attr_reader :parent, :image, :maintainer, :options, :pre_build, :bind, :command, :timeout, :name, :tags, :run
 
     def initialize(config,image)
+      @config = config
       @parent = Baha::Image.parse_with_default(image['parent'] || config.defaults[:parent], config.defaults[:repository])
       @image  = Baha::Image.parse_with_default(image['name'], config.defaults[:repository])
       @image[:tag] = image['tag'] if image.has_key?('tag')
@@ -78,7 +79,7 @@ module Baha
       @command = image['command'] || config.defaults[:command]
       @run = image['run']
       @timeout = image['timeout'] || config.defaults[:timeout]
-      @workspace = config.workspace + (image['workspace'] || @image[:name])
+      @workspace = image['workspace'] || @image[:name]
       @name = @image[:name]
       @tags = Set.new [
         "#{@image[:name]}:#{@image[:tag]}",
@@ -90,6 +91,14 @@ module Baha
       end
     end
 
+    def host_mount
+      @config.workspace_for(@workspace)
+    end
+
+    def workspace
+      @config.workspace + @workspace
+    end
+
     def env
       {
         :parent => @parent,
@@ -97,7 +106,7 @@ module Baha
         :bind => @bind,
         :name => @image[:name],
         :tag  => @image[:tag],
-        :workspace => @workspace.expand_path.to_s
+        :workspace => workspace.expand_path.to_s
       }
     end
 
